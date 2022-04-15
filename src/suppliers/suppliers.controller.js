@@ -25,7 +25,7 @@ function hasOnlyValidProperties(req, res, next) {
   next();
 }
 
-
+// ************* REVIEW **************
 const hasRequiredProperties = hasProperties("supplier_name", "supplier_email");
 // ************************************
 // *** REVIEW: why can't I use this syntax instead of the one above ^^^^
