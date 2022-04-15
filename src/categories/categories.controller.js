@@ -1,13 +1,24 @@
+const categoriesService = require("./categories.service");
+
+/* *** PROMISE CHAIN VERSION *** */
+// async function list(req, res, next) {
+//   categoriesService
+//     .list()
+//     .then(data => res.json({data}))
+//     .catch(next);
+// }
+
+
+/* *** ASYNC AWAIT VERSION *** */
 async function list(req, res, next) {
-  res.json({
-    data: [
-      { category_name: "category 1" },
-      { category_name: "category 2" },
-      { category_name: "category 3" },
-    ],
-  });
+  try{
+    const data = await categoriesService.list();
+    res.json({data});
+  }catch(err){
+    next(err);
+  }
 }
 
 module.exports = {
-  list: [list],
+  list
 };
