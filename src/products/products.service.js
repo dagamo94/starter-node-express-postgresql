@@ -26,7 +26,7 @@ function listPriceSummary() {
         .avg("product_price")
         .groupBy("supplier_id");
 }
-
+//
 function listTotalWeightByProduct() {
     return knex(productsTable)
         .select(
