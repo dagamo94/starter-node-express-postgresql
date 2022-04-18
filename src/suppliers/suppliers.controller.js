@@ -115,7 +115,7 @@ async function update(req, res, next) {
 
 // **** Example from lesson using promise chain
 function update_PromiseChainVersion(req, res, next) {
-  const udpatedSupplier = {
+  const updatedSupplier = {
     ...req.body.data,
     supplier_id: res.locals.supplier.supplier_id
   };
