@@ -1,5 +1,6 @@
 const suppliersService = require("./suppliers.service");
 const hasProperties = require("../errors/hasProperties");
+const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
 const VALID_PROPERTIES = [
   "supplier_name",
@@ -20,7 +21,7 @@ function hasOnlyValidProperties(req, res, next) {
   const invalidFields = Object.keys(data).filter(field => !VALID_PROPERTIES.includes(field));
 
   if (invalidFields.length) {
-    return next({ status: 400, message: `Invalid field${invalidFields.length > 1 ? "s" : ""}: ${invalidFields.join(", ")}` })
+    return next({ status: 400, message: `Invalid field${invalidFields.length > 1 ? "s" : ""}: ${invalidFields.join(", ")}` });
   }
   next();
 }
@@ -69,7 +70,7 @@ function supplierExists_PromiseChainVersion(req, res, next) {
 
 async function list(req, res) {
   const suppliersList = await suppliersService.list();
-  res.json({ data: suppliersList });
+  res.json({ suppliersList });
 }
 
 async function create(req, res, next) {
@@ -79,6 +80,11 @@ async function create(req, res, next) {
   } catch (error) {
     next(error);
   }
+}
+
+async function create_Lesson_version(req, res, next) {
+  const data = await suppliersService.create(req.body.data);
+  res.status(201).json({ data });
 }
 
 function create_PromiseChainVersion(req, res, next) {
@@ -108,29 +114,44 @@ async function update(req, res, next) {
 }
 
 // **** Example from lesson using promise chain
-function update_PromiseChainVersion(req, res, next){
+function update_PromiseChainVersion(req, res, next) {
   const udpatedSupplier = {
     ...req.body.data,
     supplier_id: res.locals.supplier.supplier_id
   };
   suppliersService
     .update(updatedSupplier)
-    .then(data => res.json({data}))
+    .then(data => res.json({ data }))
     .catch(next);
 }
 
+// **** Example refactored code from lesson 35.7
+async function update_Async_Lesson_Version(req, res) {
+  const updatedSupplier = {
+    ...req.body.data,
+    supplier_id: res.locals.supplier.supplier_id
+  };
+  const data = await suppliersService.update(updatedSupplier);
+  res.json({ data });
+}
 async function destroy(req, res, next) {
-  try{
+  try {
     await suppliersService.delete(res.locals.supplier.supplier_id);
     res.sendStatus(204);
-  }catch(error){
+  } catch (error) {
     next(error);
   }
 }
 
+async function destroy_Refactor_Version_from_Lesson(req, res, next) {
+  const { supplier } = res.locals;
+  await suppliersService.delete(supplier.supplier_id);
+  res.sendStatus(204);
+}
+
 module.exports = {
   list,
-  create: [hasOnlyValidProperties, hasRequiredProperties, create],
-  update: [supplierExists, hasOnlyValidProperties, hasRequiredProperties, update],
-  delete: [supplierExists, destroy],
+  create: [hasOnlyValidProperties, hasRequiredProperties, asyncErrorBoundary(create)],
+  update: [asyncErrorBoundary(supplierExists), hasOnlyValidProperties, hasRequiredProperties, asyncErrorBoundary(update)],
+  delete: [asyncErrorBoundary(supplierExists), asyncErrorBoundary(destroy)],
 };
