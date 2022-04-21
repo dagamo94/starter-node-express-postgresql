@@ -98,7 +98,7 @@ function create_PromiseChainVersion(req, res, next) {
 The function above calls the SuppliersService.update() method, passing in the updatedSupplier object. Note that the supplier_id of updatedSupplier is always set to the existing supplier_id (res.locals.supplier.supplier_id) to prevent the update from accidentally, or intentionally, changing the supplier_id during an update. If the promise resolves successfully, then the server responds with the updated supplier.
 */
 
-// **** Example code in the lesson uses promise chains wheres the gitHub repo comes with async functions like below
+// **** Example code in the lesson uses promise chains whereas the gitHub repo comes with async functions like below
 async function update(req, res, next) {
   const updatedSupplier = {
     ...req.body.data,
